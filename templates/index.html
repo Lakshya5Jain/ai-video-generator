@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Generator</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { background: #eef2f3; font-family: 'Poppins', sans-serif; }
+    .container { margin-top: 40px; max-width: 900px; }
+    .card { border: none; border-radius: 15px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: #fff; }
+    .nav-tabs .nav-link { font-weight: 600; color: #555; border: none; background: transparent; padding: 10px 20px; }
+    .nav-tabs .nav-link.active { color: #0d6efd; border-bottom: 3px solid #0d6efd; }
+    /* TikTok-Style Past Videos Feed */
+    .fullscreen-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+    .fullscreen-video {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      scroll-snap-align: start;
+    }
+    .fullscreen-video video {
+      height: 100%;
+      width: auto;
+      max-width: calc(100vh * (9 / 16));
+      border-radius: 15px;
+      background: #000;
+    }
+    .video-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 10%;
+      width: 80%;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs justify-content-center mb-4" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="generate-tab" data-bs-toggle="tab" href="#generate-section" role="tab">Generate Video</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="past-videos-tab" data-bs-toggle="tab" href="#past-videos-section" role="tab">Past Videos</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <!-- Generate Video Section -->
+      <div class="tab-pane fade show active" id="generate-section" role="tabpanel">
+        <div class="card">
+          <h2 class="mb-4 text-center">Video Generator</h2>
+          <form action="/generate" method="post">
+            <!-- Script Option -->
+            <div class="mb-3">
+              <label class="form-label">Script Option:</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="script_option" id="gpt" value="gpt" checked>
+                <label class="form-check-label" for="gpt">Generate with GPT</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="script_option" id="custom" value="custom">
+                <label class="form-check-label" for="custom">I will provide my own script</label>
+              </div>
+            </div>
+            <!-- Topic field (shown if GPT option is selected) -->
+            <div class="mb-3" id="topic-group">
+              <label for="topic" class="form-label">Topic/Keyword</label>
+              <input type="text" class="form-control" id="topic" name="topic" placeholder="E.g., The benefits of meditation">
+            </div>
+            <!-- Custom script text area (shown if custom option is selected) -->
+            <div class="mb-3" id="custom-script-group" style="display:none;">
+              <label for="custom_script" class="form-label">Custom Script</label>
+              <textarea class="form-control" id="custom_script" name="custom_script" rows="4" placeholder="Enter your script here..."></textarea>
+            </div>
+            <!-- Supporting media URL -->
+            <div class="mb-3">
+              <label for="supporting_video" class="form-label">Supporting Video or Photo URL (Optional)</label>
+              <input type="url" class="form-control" id="supporting_video" name="supporting_video" placeholder="Enter URL for supporting media">
+            </div>
+            <!-- Voice selection dropdown with all options -->
+            <div class="mb-3">
+              <label for="voice_id" class="form-label">Select Voice</label>
+              <select name="voice_id" id="voice_id" class="form-select">
+                <option value="NFG5qt843uXKj4pFvR7C">Adam - British male</option>
+                <option value="CBHdTdZwkV4jYoCyMV1B">African American - Female</option>
+                <option value="gYr8yTP0q4RkX1HnzQfX">African American - Male</option>
+                <option value="LXVY607YcjqxFS3mcult" selected>Alex - Male</option>
+                <option value="ZF6FPAbjXT4488VcRRnw">Amelia - British female</option>
+                <option value="NYC9WEgkq1u4jiqBseQ9">Announcer - British man</option>
+                <option value="L0Dsvb3SLTyegXwtm47J">Archer - British male</option>
+                <option value="ZkXXWlhJO3CtSXof2ujN">Ava - American female</option>
+                <option value="kPzsL2i3teMYv0FxEYQ6">Brittney - American female</option>
+                <option value="ngiiW8FFLIdMew1cqwSB">Chinese American - Female</option>
+                <option value="gAMZphRyrWJnLMDnom6H">Chinese American - Male</option>
+                <option value="qNkzaJoHLLdpvgh5tISm">Cowboy</option>
+                <option value="FVQMzxJGPUBtfz1Azdoy">Danielle - American female</option>
+                <option value="L5Oo1OjjHdbIvJDQFgmN">Demon Bartholomeus</option>
+                <option value="vfaqCOvlrKi4Zp7C2IAm">Demon Monster</option>
+                <option value="eVItLK1UvXctxuaRV2Oq">Femme Fetale - Female</option>
+                <option value="j9jfwdrw7BRfcR43Qohk">Frederick - British male</option>
+                <option value="txtf1EDouKke753vN8SL">French - Female</option>
+                <option value="IHngRooVccHyPqB4uQkG">French - Male</option>
+                <option value="JBFqnCBsd6RMkjVDRZzb">George - British male</option>
+                <option value="AnvlJBAqSLDzEevYr9Ap">German - Female</option>
+                <option value="NOpBlnGInO9m6vDvFkFC">Grandpa - American</option>
+                <option value="BY77WcifAQZkoI7EftFd">Indian - Female</option>
+                <option value="siw1N9V8LmYeEWKyWBxv">Indian - Male</option>
+                <option value="BZc8d1MPTdZkyGbE9Sin">Italian - Female</option>
+                <option value="t3hJ92dgZhDVtsff084B">Italian - Male</option>
+                <option value="pO3rCaEbT3xVc0h3pPoG">Ivan the Mighty</option>
+                <option value="i4CzbCVWoqvD0P1QJCUL">Ivy - American female</option>
+                <option value="7p1Ofvcwsv7UBPoFNcpI">Julian - British male</option>
+                <option value="JEAgwU0JZFGxl2KjC3if">Maribeth - American female</option>
+                <option value="rCuVrCHOUMY3OwyJBJym">Mia - Raspy American female</option>
+                <option value="FMQtISLdv5RvjpHBgf60">Neil - British male</option>
+                <option value="A8rwEcJwudjohY1gjPfa">Nigerian - Female</option>
+                <option value="JoYo65swyP8hH6fVMeTO">Old Wizard</option>
+                <option value="gbLy9ep70G3JW53cTzFC">Romanian - Female</option>
+                <option value="LT7npgnEogysurF7U8GR">Rosie - Young girl</option>
+                <option value="ZRwrL4id6j1HPGFkeCzO">Sam - American male</option>
+                <option value="LtPsVjX1k0Kl4StEMZPK">Sophia - Female</option>
+                <option value="sTgjlXyTKe3nwbzzjDAZ">Southern Accent - Male</option>
+                <option value="hKUnzqLzU3P9IVhYHREu">Tex - American male</option>
+                <option value="bn5HJAJ1igu4dFplCXkQ">Toddler</option>
+                <option value="mLJVsC2pwqCmmrBUAzg6">Vallerie - Old British female</option>
+                <option value="flHkNRp1BlvT73UL6gyz">Villain - Female</option>
+                <option value="INDKfphIpZiLCUiXae4o">Villain - Male</option>
+                <option value="luVEyhT3CocLZaLBps8v">Vivian - Australian Female</option>
+                <option value="nbk2esDn4RRk4cVDdoiE">Whispering - Female</option>
+              </select>
+            </div>
+            <!-- Voice Character Media URL -->
+            <div class="mb-3">
+              <label for="voice_media_link" class="form-label">Voice Character Media URL</label>
+              <input type="url" class="form-control" id="voice_media_link" name="voice_media_link" placeholder="Enter URL for voice character image">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Generate Video</button>
+          </form>
+        </div>
+      </div>
+      <!-- Past Videos Section -->
+      <div class="tab-pane fade" id="past-videos-section" role="tabpanel">
+        {% if videos %}
+          <div class="fullscreen-feed">
+            {% for video in videos %}
+              <div class="fullscreen-video">
+                <video controls playsinline>
+                  <source src="{{ video.final_video_url }}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+                <div class="video-overlay">
+                  <p><strong>Script:</strong> {{ video.script_text }}</p>
+                  <small>Created on: {{ video.timestamp | int | datetimeformat }}</small>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-center">No past videos found. Generate one to get started!</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const gptRadio = document.getElementById("gpt");
+      const customRadio = document.getElementById("custom");
+      const topicGroup = document.getElementById("topic-group");
+      const customGroup = document.getElementById("custom-script-group");
+      function toggleScriptFields() {
+        if (customRadio.checked) {
+          topicGroup.style.display = "none";
+          customGroup.style.display = "block";
+        } else {
+          topicGroup.style.display = "block";
+          customGroup.style.display = "none";
+        }
+      }
+      gptRadio.addEventListener("change", toggleScriptFields);
+      customRadio.addEventListener("change", toggleScriptFields);
+      toggleScriptFields();
+    });
+  </script>
+</body>
+</html>
