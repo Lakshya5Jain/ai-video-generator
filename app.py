@@ -275,6 +275,9 @@ def result():
         return "Processing not complete yet. Please refresh in a moment."
     return render_template("result.html", final_video_url=data["final_video_url"], script_text=data["script_text"])
 
-if __name__ == "__main__":
+@app.before_first_request
+def create_tables():
     init_db()
+
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
