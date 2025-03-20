@@ -21,6 +21,8 @@ AI_BASE_URL = os.getenv("AI_BASE_URL")
 CREATOMATE_BASE_URL = os.getenv("CREATOMATE_BASE_URL")
 
 app = Flask(__name__)
+
+
 app.secret_key = 'your_secret_key_here'  # This key is used to sign session cookies and secure session data.
 
 # Database for saving past videos
@@ -50,6 +52,10 @@ def save_video_to_db(final_video_url, script_text, timestamp):
 
 # Global dictionary to store processing progress (keyed by process ID)
 progress_dict = {}
+
+# Immediately create your DB table
+with app.app_context():
+    init_db()
 
 def generate_script(topic):
     """Generate a TikTok-style script from ChatGPT based on the given topic."""
@@ -274,10 +280,6 @@ def result():
     if data["progress"] < 100 or not data.get("final_video_url"):
         return "Processing not complete yet. Please refresh in a moment."
     return render_template("result.html", final_video_url=data["final_video_url"], script_text=data["script_text"])
-
-@app.before_first_request
-def create_tables():
-    init_db()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
